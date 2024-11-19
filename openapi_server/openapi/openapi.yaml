@@ -1,0 +1,913 @@
+openapi: 3.0.0
+info:
+  description: API para la gestión de usuarios que consumiran los servicios de la
+    aplicación de tipo Netflix
+  title: Microservicio de Usuarios de una aplicación de tipo Netflix
+  version: 1.0.0
+servers:
+- url: /
+tags:
+- description: Representa uno de los usuarios que consumirán los servicios de la aplicación
+    de tipo Netflix
+  name: usuario
+paths:
+  /user/logout:
+    get:
+      description: Cerrar la sesión de la cuenta de un usuario registrado con su email
+        y su password en la aplicación
+      operationId: logout_usuario
+      responses:
+        "200":
+          description: Se ha cerrado sesión con éxito
+        "500":
+          description: Error del servidor
+      summary: Cerrar sesión en el sistema con la cuenta de un usuario
+      tags:
+      - usuario
+      x-openapi-router-controller: openapi_server.controllers.usuario_controller
+  /usuario:
+    get:
+      description: Retorna el conjunto de usuarios registrados en la aplicación
+      operationId: get_all_usuarios
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Usuario'
+                type: array
+            application/xml:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Usuario'
+                type: array
+          description: Se ha obtenido exitosamente la lista de usuarios
+        "500":
+          description: Error del servidor
+      summary: Obtener la lista de usuarios registrados en la aplicación
+      tags:
+      - usuario
+      x-openapi-router-controller: openapi_server.controllers.usuario_controller
+    post:
+      description: Crea una nueva cuenta en la aplicación que estará asociada a un
+        nuevo usuario
+      operationId: add_usuario
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Usuario'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Usuario'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+          description: Usuario creado exitosamente
+        "400":
+          description: Entrada invalida
+        "422":
+          description: Excepción en la validación
+        "500":
+          description: Error del servidor
+      summary: Añadir un nuevo usuario a la aplicación
+      tags:
+      - usuario
+      x-openapi-router-controller: openapi_server.controllers.usuario_controller
+  /usuario/login:
+    post:
+      description: Iniciar sesión en la aplicación a través de la cuenta de un usuario
+        registrado utilizando su email y su password
+      operationId: login_usuario
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/loginUsuario_request'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/loginUsuario_request'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/loginUsuario_200_response'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/loginUsuario_200_response'
+          description: Se ha iniciado sesión exitosamente
+        "400":
+          description: Email y/o password proporcionados inválidos
+      summary: Iniciar sesión en el sistema con la cuenta de un usuario
+      tags:
+      - usuario
+      x-openapi-router-controller: openapi_server.controllers.usuario_controller
+  /usuario/{idUsuario}:
+    delete:
+      description: Elimina un contenido multimedia específico de la aplicación en
+        función del identificador proporcionado
+      operationId: delete_usuario
+      parameters:
+      - description: ID del usuario a borrar
+        explode: false
+        in: path
+        name: idUsuario
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "200":
+          description: Usuario eliminado exitosamente
+        "400":
+          description: ID proporcionado inválido
+        "404":
+          description: Contenido no encontrado
+        "500":
+          description: Error del servidor
+      summary: Eliminar un usuario específico por su ID
+      tags:
+      - usuario
+      x-openapi-router-controller: openapi_server.controllers.usuario_controller
+    get:
+      description: Retorna la información de un usuario en función del identificador
+        proporcionado
+      operationId: get_usuario_by_id
+      parameters:
+      - description: ID del usuario a devolver
+        explode: false
+        in: path
+        name: idUsuario
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+          description: Se ha obtenido exitosamente los detalles del usuario
+        "400":
+          description: ID proporcionado inválido
+        "404":
+          description: Usuario no encontrado
+        "500":
+          description: Error del servidor
+      summary: Obtener un usuario específico por su ID
+      tags:
+      - usuario
+      x-openapi-router-controller: openapi_server.controllers.usuario_controller
+    put:
+      description: Actualiza la información de un usuario registrado en función del
+        identificador proporcionado
+      operationId: update_usuario
+      parameters:
+      - description: ID del usuario a actualizar
+        explode: false
+        in: path
+        name: idUsuario
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Usuario'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Usuario'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+          description: Se ha actualizado exitosamente los detalles del usuario
+        "400":
+          description: ID proporcionado inválido
+        "404":
+          description: Contenido no encontrado
+        "422":
+          description: Excepción en la validación
+        "500":
+          description: Error del servidor
+      summary: Actualizar un usuario específico por su ID
+      tags:
+      - usuario
+      x-openapi-router-controller: openapi_server.controllers.usuario_controller
+  /usuario/{idUsuario}/Perfiles:
+    get:
+      description: Retorna el conjunto de perfiles asociados a un usuario específico
+        de la aplicación en función del identificador proporcionado
+      operationId: get_all_perfiles
+      parameters:
+      - description: ID del usuario del que se obtendrán sus perfiles
+        explode: false
+        in: path
+        name: idUsuario
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Perfil'
+                type: array
+            application/xml:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Perfil'
+                type: array
+          description: Se ha obtenido exitosamente el listado de perfiles del usuario
+        "400":
+          description: ID proporcionado inválido
+        "500":
+          description: Error del servidor
+      summary: Obtener la lista de los perfiles asociados a un usuario por su ID
+      tags:
+      - usuario
+      x-openapi-router-controller: openapi_server.controllers.usuario_controller
+    post:
+      description: Añade un nuevo perfil a un usuario en función del identificador
+        proporcionado
+      operationId: add_perfil
+      parameters:
+      - description: ID del usuario al que se le añadirá un nuevo perfil
+        explode: false
+        in: path
+        name: idUsuario
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Perfil'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Perfil'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Perfil'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Perfil'
+          description: Perfil creado exitosamente
+        "400":
+          description: Entrada invalida
+        "422":
+          description: Excepción en la validación
+        "500":
+          description: Error del servidor
+      summary: Añadir un nuevo perfil a un usuario por su ID
+      tags:
+      - usuario
+      x-openapi-router-controller: openapi_server.controllers.usuario_controller
+  /usuario/{idUsuario}/{nombrePerfil}:
+    delete:
+      description: Elimina un perfil específico de un usuario registrado en el sistema
+        en función del identificador proporcionado
+      operationId: delete_perfil
+      parameters:
+      - description: ID del usuario del que se borrará el perfil
+        explode: false
+        in: path
+        name: idUsuario
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      - description: Nombre del perfil que se borrará
+        explode: false
+        in: path
+        name: nombrePerfil
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: Perfil eliminado exitosamente
+        "400":
+          description: ID y/o nombrePerfil proporcionados inválido
+        "404":
+          description: Usuario o perfil no encontrado
+        "500":
+          description: Error del servidor
+      summary: Eliminar un perfil específico por su nombre
+      tags:
+      - usuario
+      x-openapi-router-controller: openapi_server.controllers.usuario_controller
+    get:
+      description: Retorna los datos de un perfil específico en función del identificador
+        proporcionado del usuario
+      operationId: get_perfil
+      parameters:
+      - description: ID del usuario del que se obtendrá el perfil
+        explode: false
+        in: path
+        name: idUsuario
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      - description: Nombre del perfil que se obtendrá
+        explode: false
+        in: path
+        name: nombrePerfil
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Perfil'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Perfil'
+          description: Se ha obtenido exitosamente el perfil indicado
+        "400":
+          description: ID y/o nombrePerfil no válidos
+        "404":
+          description: Perfil no encontrado
+        "500":
+          description: Error del servidor
+      summary: Obtener un perfil específico por su nombre
+      tags:
+      - usuario
+      x-openapi-router-controller: openapi_server.controllers.usuario_controller
+    put:
+      description: Actualiza un perfil específico de un usuario registrado en el sistema
+        en función del identificador proporcionado del usuario
+      operationId: update_perfil
+      parameters:
+      - description: ID del usuario del que se actualizará el perfil
+        explode: false
+        in: path
+        name: idUsuario
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      - description: Nombre del perfil que se actualizará
+        explode: false
+        in: path
+        name: nombrePerfil
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Perfil'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Perfil'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Perfil'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Perfil'
+          description: Perfil actualizado exitosamente
+        "400":
+          description: ID y/o nombrePerfil proporcionados inválidos
+        "404":
+          description: Perfil no encontrado
+        "422":
+          description: Excepción en la validación
+        "500":
+          description: Error del servidor
+      summary: Actualizar un perfil específico por su nombre
+      tags:
+      - usuario
+      x-openapi-router-controller: openapi_server.controllers.usuario_controller
+  /usuario/{idUsuario}/{nombrePerfil}/ListaFavoritos:
+    get:
+      description: Retorna el conjunto de contenidos multimedia favoritos de un perfil
+        específico perteneciente a un usuario en función de su identificador
+      operationId: get_favoritos
+      parameters:
+      - description: ID del usuario del que se obtendrá la lista de favoritos de uno
+          de sus perfiles
+        explode: false
+        in: path
+        name: idUsuario
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      - description: nombre del perfil del que se obtendrá su lista de favoritos
+        explode: false
+        in: path
+        name: nombrePerfil
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Contenido'
+                type: array
+            application/xml:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Contenido'
+                type: array
+          description: Se ha obtenido exitosamente el listado de favoritos
+        "400":
+          description: ID y/o nombrePerfil proporcionados inválidos
+        "404":
+          description: Perfil no encontrado
+        "500":
+          description: Error del servidor
+      summary: Obtener el listado de contenidos multimedia favoritos de un perfil
+        específico de un usuario por su ID
+      tags:
+      - usuario
+      x-openapi-router-controller: openapi_server.controllers.usuario_controller
+    post:
+      description: Añade un nuevo contenido al conjunto de contenidos multimedia favoritos
+        de un perfil específico perteneciente a un usuario en función de su identificador
+      operationId: add_favorito
+      parameters:
+      - description: ID del usuario al que se le añadirá un contenido a la lista de
+          favoritos de uno de sus perfiles
+        explode: false
+        in: path
+        name: idUsuario
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      - description: nombre del perfil al que se le añadirá un contenido a su lista
+          de favoritos
+        explode: false
+        in: path
+        name: nombrePerfil
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContenidoFavorito'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/ContenidoFavorito'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contenido'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Contenido'
+          description: Contenido añadido exitosamente
+        "400":
+          description: ID y/o nombrePerfil proporcionados inválidos
+        "422":
+          description: Excepción en la validación
+        "500":
+          description: Error del servidor
+      summary: Añadir un nuevo contenido al listado de favoritos de un perfil específico
+        de un usuario por su ID
+      tags:
+      - usuario
+      x-openapi-router-controller: openapi_server.controllers.usuario_controller
+  /usuario/{idUsuario}/{nombrePerfil}/{ContenidoFavorito}:
+    get:
+      description: Retorna un contenido multimedia perteneciente al listado de contenidos
+        favoritos de un perfil específico perteneciente a un usuario en función de
+        su identificador
+      operationId: get_contenido_favorito
+      parameters:
+      - description: ID del usuario del que se obtendrá el contenido de la lista de
+          favoritos de uno de sus perfiles
+        explode: false
+        in: path
+        name: idUsuario
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      - description: nombre del perfil del que se obtendrá el contenido de su lista
+          de favoritos
+        explode: false
+        in: path
+        name: nombrePerfil
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: ID del contenido marcado como favorito que se obtendrá
+        explode: false
+        in: path
+        name: ContenidoFavorito
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contenido'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Contenido'
+          description: Se ha obtenido el contenido perteneciente a favoritos exitosamente
+        "400":
+          description: ID y/o nombrePerfil proporcionados inválidos
+        "404":
+          description: Perfil no encontrado
+        "500":
+          description: Error del servidor
+      summary: Obtener un contenido multimedia marcado como favorito de un perfil
+        específico de un usuario
+      tags:
+      - usuario
+      x-openapi-router-controller: openapi_server.controllers.usuario_controller
+components:
+  schemas:
+    Usuario:
+      example:
+        metodoPago: paypal
+        password: password1
+        idUsuario: 5
+        perfilesUsuario:
+        - favoritosPerfil:
+          - 10
+          - 10
+          nombrePerfil: Marcos1
+        - favoritosPerfil:
+          - 10
+          - 10
+          nombrePerfil: Marcos1
+        email: asee@gmail.com
+        status: activo
+      properties:
+        idUsuario:
+          description: Identificador único del usuario
+          example: 5
+          title: idUsuario
+          type: integer
+        email:
+          description: Correo electrónico asociado a la cuenta perteneciente al usuario
+            y junto a la contraseña permiten el acceso a la misma y a los servicios
+            que ofrece la aplicación
+          example: asee@gmail.com
+          title: email
+          type: string
+        password:
+          description: Contraseña que junto al correo electrónico se encuentran asociados
+            a la cuenta perteneciente al usuario y le permiten el acceso a la misma
+            y a los servicios que ofrece la aplicación
+          example: password1
+          title: password
+          type: string
+        metodoPago:
+          description: Forma en la que el usuario realiza el pago correspondiente
+            a los servicios contratados en la aplicación
+          enum:
+          - tarjeta de credito
+          - tarjeta virtual
+          - tarjeta prepago
+          - paypal
+          example: paypal
+          title: metodoPago
+          type: string
+        status:
+          description: Estado en el que la cuenta asociada al usuario se encuentra
+            en este momento
+          enum:
+          - activo
+          - en suspension
+          - pendiente de pago
+          example: activo
+          title: status
+          type: string
+        perfilesUsuario:
+          description: "Conjunto de perfiles pertenecientes a la cuenta asociada al\
+            \ usuario. Este atributo se ha definido como un array de objetos, en el\
+            \ cual cada posición almacenará la información referente a un perfil,\
+            \ es decir, nombrePerfil y favoritosPerfil"
+          items:
+            $ref: '#/components/schemas/Perfil'
+          title: perfilesUsuario
+          type: array
+      title: Usuario
+      type: object
+      xml:
+        name: usuario
+    Perfil:
+      description: Representa un único perfil perteneciente a la cuenta asociado al
+        usuario.
+      example:
+        favoritosPerfil:
+        - 10
+        - 10
+        nombrePerfil: Marcos1
+      properties:
+        nombrePerfil:
+          description: Nombre con el cual se identificará el perfil. Este nombre no
+            podrá ser el mismo para dos perfiles pertenecientes a la misma cuenta
+          example: Marcos1
+          title: nombrePerfil
+          type: string
+        favoritosPerfil:
+          description: Representa la lista de contenidos multimedia de la aplicacion
+            que la persona que utiliza el perfil ha marcado como favoritos. Este array
+            almacenará únicamente el identificador de dichos contenidos con el fin
+            de simplificar y facilitar la implementación de la aplicación.
+          items:
+            $ref: '#/components/schemas/ContenidoFavorito'
+          title: favoritosPerfil
+          type: array
+      title: Perfil
+      type: object
+    ContenidoFavorito:
+      description: Identificador del contenido multimedia marcado como favorito por
+        la persona que utiliza el perfil
+      example: 10
+      title: ContenidoFavorito
+      type: integer
+    Contenido:
+      example:
+        tipo: serie
+        temporadas:
+        - episodios:
+          - tituloEpisodio: Celebration
+            numeroEpisodio: 5
+            duracionEpisodio: 60
+          - tituloEpisodio: Celebration
+            numeroEpisodio: 5
+            duracionEpisodio: 60
+          numeroTemporada: 1
+        - episodios:
+          - tituloEpisodio: Celebration
+            numeroEpisodio: 5
+            duracionEpisodio: 60
+          - tituloEpisodio: Celebration
+            numeroEpisodio: 5
+            duracionEpisodio: 60
+          numeroTemporada: 1
+        idContenido: 10
+        director: Mark Mylod
+        elenco: "Brian Cox, Jeremy Strong, Sarah Snook, Kieran Culkin, Hiam Abbass"
+        genero: drama
+        titulo: Succession
+        duracion: 120
+        imagen:
+        - imagen
+        - imagen
+        sinopsis: Familia de ricos
+      properties:
+        idContenido:
+          description: Identificador único del contenido
+          example: 10
+          title: idContenido
+          type: integer
+        titulo:
+          description: Nombre del contenido
+          example: Succession
+          title: titulo
+          type: string
+        tipo:
+          description: "Categoría multimedia a la cual pertenece el contenido (Pelí\
+            cula, documental, serie…)"
+          enum:
+          - serie
+          - pelicula
+          - corto
+          - documental
+          example: serie
+          title: tipo
+          type: string
+        sinopsis:
+          description: Resumen general e información referente al contenido
+          example: Familia de ricos
+          title: sinopsis
+          type: string
+        duracion:
+          description: Intervalo de tiempo en minutos que transcurre entre el comienzo
+            y el fin del contenido
+          example: 120
+          title: duracion
+          type: integer
+        temporadas:
+          description: "Conjunto de temporadas que conforman la serie (solo en el\
+            \ caso de que el contenido sea de tipo serie. Si el contenido no es de\
+            \ tipo serie este array estará vacío y no contendrá información útil).\
+            \ Este atributo se ha definido como un array de objetos, en el cual cada\
+            \ posición almacenará la información referente a una temporada, es decir,\
+            \ numeroTemporada y episodios"
+          items:
+            $ref: '#/components/schemas/Temporadas_inner'
+          title: temporadas
+          type: array
+        genero:
+          description: "Temática en la que puede clasificarse el contenido multimedia\
+            \ (Horror, comedia, romance, fantasía…)"
+          enum:
+          - horror
+          - aventura
+          - comedia
+          - thriller
+          - drama
+          - romance
+          - fantasia
+          - ciencia ficcion
+          example: drama
+          title: genero
+          type: string
+        director:
+          description: Responsable principal encargado de dirigir la filmación o rodaje
+            del contenido en términos artísticos
+          example: Mark Mylod
+          title: director
+          type: string
+        elenco:
+          description: "Conjunto de personas, normalmente los actores y actrices principales,\
+            \ que han participado en la producción y grabación del contenido"
+          example: "Brian Cox, Jeremy Strong, Sarah Snook, Kieran Culkin, Hiam Abbass"
+          items:
+            type: string
+          title: elenco
+          type: array
+        imagen:
+          description: Fotografía representativa del contenido multimedia
+          items:
+            type: string
+          title: imagen
+          type: array
+          xml:
+            wrapped: true
+      title: Contenido
+      type: object
+    Temporadas:
+      description: "Conjunto de temporadas que conforman la serie (solo en el caso\
+        \ de que el contenido sea de tipo serie. Si el contenido no es de tipo serie\
+        \ este array estará vacío y no contendrá información útil). Este atributo\
+        \ se ha definido como un array de objetos, en el cual cada posición almacenará\
+        \ la información referente a una temporada, es decir, numeroTemporada y episodios"
+      items:
+        $ref: '#/components/schemas/Temporadas_inner'
+      title: temporadas
+      type: array
+    Episodios:
+      description: "Listado de episodios que conforman la temporada a la que se está\
+        \ accediendo en el array. Este atributo se ha definido como un array de objetos,\
+        \ en el cual cada posición almacenará la información referente a un episodio\
+        \ de la temporada actual, es decir, numeroEpisodio, tituloEpisodio y duracionEpisodio"
+      items:
+        $ref: '#/components/schemas/Episodios_inner'
+      title: Episodios
+      type: array
+    loginUsuario_request:
+      properties:
+        email:
+          description: Correo electrónico asociado a la cuenta perteneciente al usuario
+            y junto a la contraseña permiten el acceso a la misma y a los servicios
+            que ofrece la aplicación
+          title: email
+          type: string
+        password:
+          description: Contraseña que junto al correo electrónico se encuentran asociados
+            a la cuenta perteneciente al usuario y le permiten el acceso a la misma
+            y a los servicios que ofrece la aplicación
+          title: password
+          type: string
+      title: loginUsuario_request
+      type: object
+    loginUsuario_200_response:
+      example:
+        idUsuario: 0
+        token: token
+      properties:
+        token:
+          description: "Si la operación se realiza exitosamente se devolverá un string,\
+            \ el cual representará el token de autenticación del usuario"
+          title: token
+          type: string
+        idUsuario:
+          description: Identificador único del usuario que ha iniciado sesión
+          title: idUsuario
+          type: integer
+      title: loginUsuario_200_response
+      type: object
+    Temporadas_inner:
+      example:
+        episodios:
+        - tituloEpisodio: Celebration
+          numeroEpisodio: 5
+          duracionEpisodio: 60
+        - tituloEpisodio: Celebration
+          numeroEpisodio: 5
+          duracionEpisodio: 60
+        numeroTemporada: 1
+      properties:
+        numeroTemporada:
+          description: Identifica el número de la temporada almacenada en la posición
+            actual del array
+          example: 1
+          title: numeroTemporada
+          type: integer
+        episodios:
+          description: "Listado de episodios que conforman la temporada a la que se\
+            \ está accediendo en el array. Este atributo se ha definido como un array\
+            \ de objetos, en el cual cada posición almacenará la información referente\
+            \ a un episodio de la temporada actual, es decir, numeroEpisodio, tituloEpisodio\
+            \ y duracionEpisodio"
+          items:
+            $ref: '#/components/schemas/Episodios_inner'
+          title: Episodios
+          type: array
+      title: Temporadas_inner
+      type: object
+    Episodios_inner:
+      example:
+        tituloEpisodio: Celebration
+        numeroEpisodio: 5
+        duracionEpisodio: 60
+      properties:
+        numeroEpisodio:
+          description: Identifica el número del episodio en la temporada a la que
+            se está accediendo
+          example: 5
+          title: numeroEpisodio
+          type: integer
+        tituloEpisodio:
+          description: Nombre del episodio
+          example: Celebration
+          title: tituloEpisodio
+          type: string
+        duracionEpisodio:
+          description: Intervalo de tiempo en minutos que transcurre entre el comienzo
+            y el fin del episodio
+          example: 60
+          title: duracionEpisodio
+          type: integer
+      title: Episodios_inner
+      type: object
