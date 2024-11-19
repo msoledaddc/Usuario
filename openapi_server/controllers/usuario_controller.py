@@ -104,7 +104,7 @@ def add_perfil(id_usuario, perfil):  # noqa: E501
 
 
 
-def add_usuario(usuario):  # noqa: E501
+def add_usuario():  # noqa: E501
     """Añadir un nuevo usuario a la aplicación
 
     Crea una nueva cuenta en la aplicación que estará asociada a un nuevo usuario # noqa: E501
@@ -147,7 +147,7 @@ def add_usuario(usuario):  # noqa: E501
             password=password, 
             metodopago=metodopago, 
             status=status,
-            )
+        )
 
     # Guardar el usuario en la base de datos
         db.session.add(new_usuario)
